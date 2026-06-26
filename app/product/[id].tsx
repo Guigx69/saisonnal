@@ -69,6 +69,7 @@ export default function ProductScreen() {
   const product = useMemo(() => {
     return (products as Product[]).find((p) => p.id === id);
   }, [id]);
+  const productId = product?.id;
 
   const monthNow = new Date().getMonth() + 1;
 
@@ -101,9 +102,9 @@ export default function ProductScreen() {
   }, []);
 
   useEffect(() => {
-    if (!product) return;
-    isFavorite(product.id).then(setFav);
-  }, [product?.id]);
+    if (!productId) return;
+    isFavorite(productId).then(setFav);
+  }, [productId]);
 
   if (!product) {
     return (
@@ -145,11 +146,12 @@ export default function ProductScreen() {
   const visibleMonths = hideOffSeasonMonths
     ? MONTHS.filter((m) => product.seasonMonths.includes(m.month) || m.month === monthNow)
     : MONTHS;
+  const currentProductId = product.id;
 
   async function onToggleFavorite() {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    await toggleFavorite(id);
-    const next = await isFavorite(id);
+    await toggleFavorite(currentProductId);
+    const next = await isFavorite(currentProductId);
     setFav(next);
   }
 

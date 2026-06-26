@@ -2,9 +2,10 @@
 import { ProductCard } from "@/components/ProductCard";
 import { Theme } from "@/constants/theme";
 import products from "@/src/data/products.json";
+import { getPreferences } from "@/src/storage/preferences";
 import type { Product } from "@/src/types/product";
 import { router } from "expo-router";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Pressable,
   ScrollView,
@@ -42,6 +43,22 @@ export default function HomeScreen() {
 
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
+
+  useEffect(() => {
+    let isMounted = true;
+
+    getPreferences()
+      .then((prefs) => {
+        if (isMounted) setFilter(prefs.defaultFilter);
+      })
+      .catch(() => {
+        // Keep the current default if preferences cannot be read.
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   function prevMonth() {
     setMonth((m) => (m === 1 ? 12 : m - 1));
