@@ -52,6 +52,52 @@ export const Theme = {
     32: 32,
   },
 
+  spacing: {
+    xxs: 4,
+    xs: 8,
+    sm: 12,
+    md: 16,
+    lg: 20,
+    xl: 24,
+    xxl: 32,
+  },
+
+  typography: {
+    sizes: {
+      caption: 11,
+      small: 12,
+      body: 14,
+      title: 18,
+      hero: 28,
+    },
+    lineHeights: {
+      caption: 14,
+      small: 16,
+      body: 20,
+      title: 24,
+      hero: 34,
+    },
+    weights: {
+      regular: "400",
+      medium: "600",
+      bold: "700",
+      heavy: "900",
+    },
+  },
+
+  semantic: {
+    background: "#F6F7F5",
+    surface: "#FFFFFF",
+    surfaceSoft: "rgba(15,23,42,0.04)",
+    textPrimary: "#0F172A",
+    textSecondary: "#6B7280",
+    border: "rgba(15,23,42,0.08)",
+    brand: "#0F172A",
+    focus: "rgba(15,23,42,0.18)",
+    danger: "#DC2626",
+    dangerSoft: "rgba(220,38,38,0.10)",
+  },
+
   // Shadow
   shadow: {
     color: "#000",
@@ -59,6 +105,29 @@ export const Theme = {
     radius: 18,
     offset: { width: 0, height: 10 },
     elevation: 2,
+  },
+
+  shadows: {
+    card: {
+      shadowColor: "#000",
+      shadowOpacity: 0.06,
+      shadowRadius: 18,
+      shadowOffset: { width: 0, height: 10 },
+      elevation: 2,
+    },
+    soft: {
+      shadowColor: "#000",
+      shadowOpacity: 0.04,
+      shadowRadius: 12,
+      shadowOffset: { width: 0, height: 8 },
+      elevation: 1,
+    },
+  },
+
+  zIndex: {
+    base: 0,
+    raised: 10,
+    overlay: 100,
   },
 } as const;
 export type ThemeTokens = typeof Theme;
