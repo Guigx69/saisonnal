@@ -62,22 +62,3 @@ export const Theme = {
   },
 } as const;
 export type ThemeTokens = typeof Theme;
-
-export const Colors = {
-  light: {
-    text: Theme.text,
-    background: Theme.bg,
-    tint: Theme.brand,
-    icon: Theme.muted,
-    tabIconDefault: Theme.muted,
-    tabIconSelected: Theme.text,
-  },
-  dark: {
-    text: "#ECEDEE",
-    background: "#151718",
-    tint: "#FFFFFF",
-    icon: "#9BA1A6",
-    tabIconDefault: "#9BA1A6",
-    tabIconSelected: "#FFFFFF",
-  },
-} as const;
