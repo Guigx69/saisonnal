@@ -18,6 +18,29 @@ export const Theme = {
   veg: "#22C55E",
   vegSoft: "rgba(34,197,94,0.15)",
 
+  category: {
+    fruit: {
+      color: "#F59E0B",
+      soft: "rgba(245,158,11,0.15)",
+    },
+    legume: {
+      color: "#22C55E",
+      soft: "rgba(34,197,94,0.15)",
+    },
+    aromate: {
+      color: "#16A34A",
+      soft: "rgba(22,163,74,0.14)",
+    },
+    fromage: {
+      color: "#D97706",
+      soft: "rgba(217,119,6,0.14)",
+    },
+    poisson: {
+      color: "#0284C7",
+      soft: "rgba(2,132,199,0.14)",
+    },
+  },
+
   // ✅ Aliases (compat) — pour éviter de casser selon les fichiers
   // (tu peux utiliser soit fruit/veg, soit accentFruit/accentVeg)
   accentFruit: "#F59E0B",

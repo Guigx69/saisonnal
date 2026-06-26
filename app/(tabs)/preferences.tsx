@@ -13,11 +13,27 @@ import {
 import { Card } from "@/components/Card";
 import { Screen } from "@/components/Screen";
 import { Theme } from "@/constants/theme";
+import products from "@/src/data/products.json";
+import type { Product, ProductCategory } from "@/src/types/product";
+import { getCategoryPluralLabel, PRODUCT_CATEGORIES } from "@/src/utils/categories";
 import {
   getPreferences,
   updatePreferences,
   type Preferences,
 } from "../../src/storage/preferences";
+
+type DefaultFilter = "all" | ProductCategory;
+
+const PRODUCT_LIST = products as Product[];
+const DEFAULT_FILTERS: { key: DefaultFilter; label: string }[] = [
+  { key: "all", label: "Tout" },
+  ...PRODUCT_CATEGORIES.filter((category) =>
+    PRODUCT_LIST.some((product) => product.category === category)
+  ).map((category) => ({
+    key: category,
+    label: getCategoryPluralLabel(category),
+  })),
+];
 
 export default function PreferencesScreen() {
   const [prefs, setPrefs] = useState<Preferences | null>(null);
@@ -85,15 +101,13 @@ export default function PreferencesScreen() {
                 </Text>
 
                 <View style={styles.segment}>
-                  {(["all", "fruit", "legume"] as const).map((k) => {
-                    const label =
-                      k === "all" ? "Tout" : k === "fruit" ? "Fruits" : "Légumes";
-                    const active = prefs.defaultFilter === k;
+                  {DEFAULT_FILTERS.map(({ key, label }) => {
+                    const active = prefs.defaultFilter === key;
 
                     return (
                       <Pressable
-                        key={k}
-                        onPress={() => patch({ defaultFilter: k })}
+                        key={key}
+                        onPress={() => patch({ defaultFilter: key })}
                         style={({ pressed }) => [
                           styles.segmentItem,
                           active && styles.segmentItemActive,

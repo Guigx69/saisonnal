@@ -1,7 +1,8 @@
 import { Theme } from "@/constants/theme";
+import type { ProductCategory } from "@/src/types/product";
 import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from "react-native";
 
-export type PillTone = "neutral" | "brand" | "fruit" | "veg" | "danger";
+export type PillTone = "neutral" | "brand" | ProductCategory | "veg" | "danger";
 
 export type PillProps = {
   label: string;
@@ -22,15 +23,34 @@ function toneColors(tone: PillTone, selected: boolean) {
   switch (tone) {
     case "fruit":
       return {
-        backgroundColor: Theme.fruitSoft,
-        borderColor: Theme.fruitSoft,
-        color: Theme.fruit,
+        backgroundColor: Theme.category.fruit.soft,
+        borderColor: Theme.category.fruit.soft,
+        color: Theme.category.fruit.color,
       };
+    case "legume":
     case "veg":
       return {
-        backgroundColor: Theme.vegSoft,
-        borderColor: Theme.vegSoft,
-        color: Theme.veg,
+        backgroundColor: Theme.category.legume.soft,
+        borderColor: Theme.category.legume.soft,
+        color: Theme.category.legume.color,
+      };
+    case "aromate":
+      return {
+        backgroundColor: Theme.category.aromate.soft,
+        borderColor: Theme.category.aromate.soft,
+        color: Theme.category.aromate.color,
+      };
+    case "fromage":
+      return {
+        backgroundColor: Theme.category.fromage.soft,
+        borderColor: Theme.category.fromage.soft,
+        color: Theme.category.fromage.color,
+      };
+    case "poisson":
+      return {
+        backgroundColor: Theme.category.poisson.soft,
+        borderColor: Theme.category.poisson.soft,
+        color: Theme.category.poisson.color,
       };
     case "danger":
       return {

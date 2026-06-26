@@ -1,9 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import type { ProductCategory } from "@/src/types/product";
 
 const KEY = "saisonnal:preferences:v1";
 
 export type Preferences = {
-  defaultFilter: "all" | "fruit" | "legume";
+  defaultFilter: "all" | ProductCategory;
   hideOffSeasonMonths: boolean;
   ecoMode: boolean;
   preferLocal: boolean;

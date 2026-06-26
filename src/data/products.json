@@ -11,5 +11,51 @@
   { "id": "brocoli", "name": "Brocoli", "category": "legume", "seasonMonths": [9,10,11,12,1,2,3], "origins": ["France","Import"] },
   { "id": "carotte", "name": "Carotte", "category": "legume", "seasonMonths": [1,2,3,4,5,6,7,8,9,10,11,12], "origins": ["France"] },
   { "id": "endive", "name": "Endive", "category": "legume", "seasonMonths": [10,11,12,1,2,3,4], "origins": ["France"] },
-  { "id": "navet", "name": "Navet", "category": "legume", "seasonMonths": [10,11,12,1,2,3], "origins": ["France"] }
+  { "id": "navet", "name": "Navet", "category": "legume", "seasonMonths": [10,11,12,1,2,3], "origins": ["France"] },
+
+  {
+    "id": "basilic-pilote",
+    "name": "Basilic",
+    "category": "aromate",
+    "seasonMonths": [],
+    "peakMonths": [],
+    "availabilityMonths": [],
+    "origins": [],
+    "localNotes": ["TODO: sourcer avant affichage comme recommandation locale."],
+    "ecoTips": [],
+    "sourceRefs": [],
+    "confidenceLevel": "unknown",
+    "isRegional": false,
+    "regionScope": "unknown"
+  },
+  {
+    "id": "chevre-frais-pilote",
+    "name": "Chèvre frais",
+    "category": "fromage",
+    "seasonMonths": [],
+    "peakMonths": [],
+    "availabilityMonths": [],
+    "origins": [],
+    "localNotes": ["TODO: sourcer saison, zone et contexte de production avant publication."],
+    "ecoTips": [],
+    "sourceRefs": [],
+    "confidenceLevel": "unknown",
+    "isRegional": false,
+    "regionScope": "unknown"
+  },
+  {
+    "id": "sardine-pilote",
+    "name": "Sardine",
+    "category": "poisson",
+    "seasonMonths": [],
+    "peakMonths": [],
+    "availabilityMonths": [],
+    "origins": [],
+    "localNotes": ["TODO: sourcer saison de pêche et zones pertinentes avant publication."],
+    "ecoTips": [],
+    "sourceRefs": [],
+    "confidenceLevel": "unknown",
+    "isRegional": false,
+    "regionScope": "unknown"
+  }
 ]

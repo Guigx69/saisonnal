@@ -7,7 +7,8 @@ import { SearchBar } from "@/components/ui/SearchBar";
 import { Theme } from "@/constants/theme";
 import products from "@/src/data/products.json";
 import { getPreferences } from "@/src/storage/preferences";
-import type { Product } from "@/src/types/product";
+import type { Product, ProductCategory } from "@/src/types/product";
+import { getCategoryPluralLabel, PRODUCT_CATEGORIES } from "@/src/utils/categories";
 import { router } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -30,13 +31,21 @@ function MonthNameFR(month: number) {
   return names[month - 1] ?? `Mois ${month}`;
 }
 
-type Filter = "all" | "fruit" | "legume";
+type Filter = "all" | ProductCategory;
 
-const FILTERS: { key: Filter; label: string }[] = [
-  { key: "all", label: "Tout" },
-  { key: "fruit", label: "Fruits" },
-  { key: "legume", label: "Légumes" },
-];
+const PRODUCT_LIST = products as Product[];
+
+function getAvailableFilters(): { key: Filter; label: string }[] {
+  const present = new Set(PRODUCT_LIST.map((product) => product.category));
+  const categoryFilters = PRODUCT_CATEGORIES.filter((category) => present.has(category)).map(
+    (category) => ({
+      key: category,
+      label: getCategoryPluralLabel(category),
+    })
+  );
+
+  return [{ key: "all", label: "Tout" }, ...categoryFilters];
+}
 
 export default function HomeScreen() {
   const monthNow = new Date().getMonth() + 1;
@@ -44,13 +53,17 @@ export default function HomeScreen() {
   const [month, setMonth] = useState(monthNow);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
+  const availableFilters = useMemo(() => getAvailableFilters(), []);
 
   useEffect(() => {
     let isMounted = true;
 
     getPreferences()
       .then((prefs) => {
-        if (isMounted) setFilter(prefs.defaultFilter);
+        const availableKeys = new Set(availableFilters.map((item) => item.key));
+        if (isMounted && availableKeys.has(prefs.defaultFilter)) {
+          setFilter(prefs.defaultFilter);
+        }
       })
       .catch(() => {
         // Keep the current default if preferences cannot be read.
@@ -59,7 +72,7 @@ export default function HomeScreen() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [availableFilters]);
 
   function prevMonth() {
     setMonth((m) => (m === 1 ? 12 : m - 1));
@@ -70,7 +83,7 @@ export default function HomeScreen() {
 
   const inSeason = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return (products as Product[])
+    return PRODUCT_LIST
       .filter((p) => p.seasonMonths.includes(month))
       .filter((p) => (filter === "all" ? true : p.category === filter))
       .filter((p) => (q ? p.name.toLowerCase().includes(q) : true))
@@ -145,12 +158,12 @@ export default function HomeScreen() {
         <SearchBar
           value={query}
           onChangeText={setQuery}
-          placeholder="Rechercher un fruit ou un légume…"
-          accessibilityLabel="Rechercher un fruit ou un légume"
+          placeholder="Rechercher un produit de saison…"
+          accessibilityLabel="Rechercher un produit de saison"
         />
 
         <View style={styles.filters}>
-          {FILTERS.map((item) => {
+          {availableFilters.map((item) => {
             const active = filter === item.key;
 
             return (
@@ -197,7 +210,7 @@ export default function HomeScreen() {
       </View>
 
       <Text style={styles.footerHint}>
-        Astuce : navigue les mois pour anticiper fruits & légumes.
+        Astuce : navigue les mois pour anticiper les produits de saison.
       </Text>
 
       <View style={{ height: Theme.space[28] }} />

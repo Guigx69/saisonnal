@@ -14,14 +14,8 @@ import { Theme } from "@/constants/theme";
 import products from "@/src/data/products.json";
 import { isFavorite, toggleFavorite } from "@/src/storage/favorites";
 import { getPreferences, type Preferences } from "@/src/storage/preferences";
-
-type Product = {
-  id: string;
-  name: string;
-  category: "fruit" | "legume";
-  seasonMonths: number[];
-  origins?: string[];
-};
+import type { Product } from "@/src/types/product";
+import { getCategoryColors, getCategoryLabel, getProductEmoji } from "@/src/utils/categories";
 
 const MONTHS = [
   { month: 1, key: "J", label: "Janvier" },
@@ -37,31 +31,6 @@ const MONTHS = [
   { month: 11, key: "N", label: "Novembre" },
   { month: 12, key: "D", label: "Décembre" },
 ] as const;
-
-function productEmoji(id: string, category: Product["category"]) {
-  const map: Record<string, string> = {
-    orange: "🍊",
-    clementine: "🍊",
-    mandarine: "🍊",
-    pomme: "🍎",
-    poire: "🍐",
-    citron: "🍋",
-    poireau: "🥬",
-    "chou-fleur": "🥦",
-    brocoli: "🥦",
-    carotte: "🥕",
-    endive: "🥬",
-    navet: "🥔",
-  };
-  return map[id] ?? (category === "fruit" ? "🍓" : "🥕");
-}
-
-function accent(category: Product["category"]) {
-  return category === "fruit" ? Theme.fruit : Theme.veg;
-}
-function accentSoft(category: Product["category"]) {
-  return category === "fruit" ? Theme.fruitSoft : Theme.vegSoft;
-}
 
 export default function ProductScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -133,13 +102,14 @@ export default function ProductScreen() {
     );
   }
 
-  const catLabel = product.category === "fruit" ? "Fruit" : "Légume";
+  const catLabel = getCategoryLabel(product.category);
+  const categoryColors = getCategoryColors(product.category);
   const inSeasonNow = product.seasonMonths.includes(monthNow);
 
   const originsLabel =
     product.origins && product.origins.length > 0
       ? product.origins.join(" • ")
-      : "France • Import";
+      : "Origines à sourcer";
 
   const hideOffSeasonMonths = Boolean(prefs?.hideOffSeasonMonths);
 
@@ -211,8 +181,8 @@ export default function ProductScreen() {
             },
           ]}
         >
-          <View style={[styles.heroEmoji, { backgroundColor: accentSoft(product.category) }]}>
-            <Text style={styles.heroEmojiText}>{productEmoji(product.id, product.category)}</Text>
+          <View style={[styles.heroEmoji, { backgroundColor: categoryColors.soft }]}>
+            <Text style={styles.heroEmojiText}>{getProductEmoji(product)}</Text>
           </View>
 
           <View style={{ flex: 1 }}>
@@ -228,12 +198,12 @@ export default function ProductScreen() {
                 style={[
                   styles.pill,
                   {
-                    backgroundColor: accentSoft(product.category),
-                    borderColor: accentSoft(product.category),
+                    backgroundColor: categoryColors.soft,
+                    borderColor: categoryColors.soft,
                   },
                 ]}
               >
-                <Text style={[styles.pillText, { color: accent(product.category) }]}>{catLabel}</Text>
+                <Text style={[styles.pillText, { color: categoryColors.color }]}>{catLabel}</Text>
               </View>
 
               <View style={[styles.pill, { backgroundColor: Theme.bg, borderColor: Theme.line }]}>

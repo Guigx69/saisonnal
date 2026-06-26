@@ -1,6 +1,7 @@
 import { Pill } from "@/components/ui/Pill";
 import { Theme } from "@/constants/theme";
 import type { Product } from "@/src/types/product";
+import { getCategoryColors, getCategoryLabel, getProductEmoji } from "@/src/utils/categories";
 import * as Haptics from "expo-haptics";
 import type React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -13,28 +14,6 @@ export type ProductCardProps = {
   variant?: "grid" | "list";
 };
 
-function accentSoft(category: Product["category"]) {
-  return category === "fruit" ? Theme.fruitSoft : Theme.vegSoft;
-}
-
-function productEmoji(id: string, category: Product["category"]) {
-  const map: Record<string, string> = {
-    orange: "🍊",
-    clementine: "🍊",
-    mandarine: "🍊",
-    pomme: "🍎",
-    poire: "🍐",
-    citron: "🍋",
-    poireau: "🥬",
-    "chou-fleur": "🥦",
-    brocoli: "🥦",
-    carotte: "🥕",
-    endive: "🥬",
-    navet: "🥔",
-  };
-  return map[id] ?? (category === "fruit" ? "🍓" : "🥕");
-}
-
 export function ProductCard({
   product,
   onPress,
@@ -43,7 +22,8 @@ export function ProductCard({
   variant = "grid",
 }: ProductCardProps) {
   const slot = actionSlot ?? rightSlot;
-  const categoryLabel = product.category === "fruit" ? "Fruit" : "Légume";
+  const categoryLabel = getCategoryLabel(product.category);
+  const categoryColors = getCategoryColors(product.category);
 
   async function handlePress() {
     try {
@@ -66,8 +46,8 @@ export function ProductCard({
         pressed && styles.pressed,
       ]}
     >
-      <View style={[styles.thumb, { backgroundColor: accentSoft(product.category) }]}>
-        <Text style={styles.emoji}>{productEmoji(product.id, product.category)}</Text>
+      <View style={[styles.thumb, { backgroundColor: categoryColors.soft }]}>
+        <Text style={styles.emoji}>{getProductEmoji(product)}</Text>
       </View>
 
       <View style={styles.content}>
@@ -77,7 +57,7 @@ export function ProductCard({
 
         <Pill
           label={categoryLabel}
-          tone={product.category === "fruit" ? "fruit" : "veg"}
+          tone={product.category}
           style={[styles.badge, { borderColor: Theme.line, backgroundColor: Theme.brandSoft }]}
         />
       </View>
