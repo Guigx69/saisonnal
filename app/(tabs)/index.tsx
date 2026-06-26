@@ -1,19 +1,16 @@
-// app/(tabs)/index.tsx
 import { ProductCard } from "@/components/ProductCard";
+import { Card } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { IconButton } from "@/components/ui/IconButton";
+import { Pill } from "@/components/ui/Pill";
+import { SearchBar } from "@/components/ui/SearchBar";
 import { Theme } from "@/constants/theme";
 import products from "@/src/data/products.json";
 import { getPreferences } from "@/src/storage/preferences";
 import type { Product } from "@/src/types/product";
 import { router } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 function MonthNameFR(month: number) {
   const names = [
@@ -35,12 +32,16 @@ function MonthNameFR(month: number) {
 
 type Filter = "all" | "fruit" | "legume";
 
+const FILTERS: { key: Filter; label: string }[] = [
+  { key: "all", label: "Tout" },
+  { key: "fruit", label: "Fruits" },
+  { key: "legume", label: "Légumes" },
+];
+
 export default function HomeScreen() {
   const monthNow = new Date().getMonth() + 1;
 
-  // ✅ mois sélectionné (flèches)
   const [month, setMonth] = useState(monthNow);
-
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
 
@@ -76,19 +77,19 @@ export default function HomeScreen() {
       .sort((a, b) => a.name.localeCompare(b.name, "fr"));
   }, [month, query, filter]);
 
+  const countLabel = inSeason.length === 1 ? "1 produit" : `${inSeason.length} produits`;
+
   return (
     <ScrollView
       style={styles.screen}
       contentContainerStyle={styles.container}
       showsVerticalScrollIndicator={false}
     >
-      {/* Brand header */}
       <View style={styles.brandRow}>
         <View style={styles.logo}>
           <Text style={styles.logoText}>S</Text>
         </View>
 
-        {/* ✅ pas de wrap du titre */}
         <View style={styles.brandText}>
           <Text numberOfLines={1} ellipsizeMode="tail" style={styles.title}>
             Saisonnal
@@ -99,20 +100,18 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* Month hero */}
-      <View style={styles.heroCard}>
+      <Card style={styles.heroCard}>
         <Text style={styles.kicker}>EN SAISON</Text>
 
-        {/* ✅ flèches + mois sur la même ligne (premium + stable) */}
         <View style={styles.heroTopRow}>
           <View style={styles.monthNav}>
-            <Pressable
+            <IconButton
+              accessibilityLabel="Mois précédent"
               onPress={prevMonth}
-              hitSlop={12}
-              style={({ pressed }) => [styles.arrowBtn, pressed && styles.pressed]}
+              style={styles.arrowBtn}
             >
               <Text style={styles.arrowText}>‹</Text>
-            </Pressable>
+            </IconButton>
 
             <Text
               style={styles.monthTitle}
@@ -122,13 +121,13 @@ export default function HomeScreen() {
               {MonthNameFR(month)}
             </Text>
 
-            <Pressable
+            <IconButton
+              accessibilityLabel="Mois suivant"
               onPress={nextMonth}
-              hitSlop={12}
-              style={({ pressed }) => [styles.arrowBtn, pressed && styles.pressed]}
+              style={styles.arrowBtn}
             >
               <Text style={styles.arrowText}>›</Text>
-            </Pressable>
+            </IconButton>
           </View>
 
           <View style={styles.monthBadge}>
@@ -140,51 +139,39 @@ export default function HomeScreen() {
         <Text style={styles.heroSub}>
           Consomme au bon moment, sans te compliquer la vie.
         </Text>
-      </View>
+      </Card>
 
-      {/* Search + filters */}
-      <View style={styles.searchCard}>
-        <TextInput
+      <View style={styles.controls}>
+        <SearchBar
           value={query}
           onChangeText={setQuery}
           placeholder="Rechercher un fruit ou un légume…"
-          placeholderTextColor={Theme.muted}
-          style={styles.searchInput}
-          autoCapitalize="none"
-          autoCorrect={false}
+          accessibilityLabel="Rechercher un fruit ou un légume"
         />
 
         <View style={styles.filters}>
-          {(["all", "fruit", "legume"] as const).map((k) => {
-            const label =
-              k === "all" ? "Tout" : k === "fruit" ? "Fruits" : "Légumes";
-            const active = filter === k;
+          {FILTERS.map((item) => {
+            const active = filter === item.key;
 
             return (
               <Pressable
-                key={k}
-                onPress={() => setFilter(k)}
-                style={({ pressed }) => [
-                  styles.pill,
-                  active && styles.pillActive,
-                  pressed && { opacity: 0.85 },
-                ]}
+                key={item.key}
+                accessibilityRole="button"
+                accessibilityLabel={`Filtrer par ${item.label}`}
+                accessibilityState={{ selected: active }}
+                onPress={() => setFilter(item.key)}
+                style={({ pressed }) => [styles.filterButton, pressed && styles.pressed]}
               >
-                <Text style={[styles.pillText, active && styles.pillTextActive]}>
-                  {label}
-                </Text>
+                <Pill label={item.label} selected={active} />
               </Pressable>
             );
           })}
         </View>
       </View>
 
-      {/* Grid */}
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>En saison</Text>
-        <View style={styles.countPill}>
-          <Text style={styles.countPillText}>{inSeason.length}</Text>
-        </View>
+        <Pill label={countLabel} tone="brand" />
       </View>
 
       <View style={styles.grid}>
@@ -192,14 +179,20 @@ export default function HomeScreen() {
           <ProductCard
             key={p.id}
             product={p}
-            onPress={() => router.push(`../product/${p.id}`)}
+            onPress={() =>
+              router.push({
+                pathname: "/product/[id]",
+                params: { id: p.id },
+              })
+            }
           />
         ))}
 
         {inSeason.length === 0 && (
-          <Text style={styles.empty}>
-            Rien trouvé pour “{query.trim() || "…"}”.
-          </Text>
+          <EmptyState
+            style={styles.empty}
+            message={`Rien trouvé pour “${query.trim() || "…"}”.`}
+          />
         )}
       </View>
 
@@ -233,13 +226,9 @@ const styles = StyleSheet.create({
     backgroundColor: Theme.text,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: Theme.shadow.color,
-    shadowOpacity: Theme.shadow.opacity,
-    shadowRadius: Theme.shadow.radius,
-    shadowOffset: Theme.shadow.offset,
-    elevation: Theme.shadow.elevation,
+    ...Theme.shadows.card,
   },
-  logoText: { color: "#fff", fontWeight: "900", fontSize: 18 },
+  logoText: { color: Theme.card, fontWeight: "900", fontSize: 18 },
 
   brandText: { flex: 1, minWidth: 0 },
   title: {
@@ -252,16 +241,7 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: 13, fontWeight: "700", color: Theme.muted },
 
   heroCard: {
-    backgroundColor: Theme.card,
-    borderRadius: Theme.r.l,
-    borderWidth: 1,
-    borderColor: Theme.line,
     padding: Theme.space[18],
-    shadowColor: Theme.shadow.color,
-    shadowOpacity: Theme.shadow.opacity,
-    shadowRadius: Theme.shadow.radius,
-    shadowOffset: Theme.shadow.offset,
-    elevation: Theme.shadow.elevation,
     gap: Theme.space[10],
   },
   kicker: {
@@ -291,14 +271,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   arrowBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: Theme.line,
-    backgroundColor: Theme.card,
-    alignItems: "center",
-    justifyContent: "center",
+    width: 44,
+    height: 44,
   },
   pressed: { opacity: 0.75, transform: [{ scale: 0.98 }] },
   arrowText: {
@@ -339,43 +313,15 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 
-  searchCard: {
-    backgroundColor: Theme.card,
-    borderRadius: Theme.r.l,
-    borderWidth: 1,
-    borderColor: Theme.line,
-    padding: Theme.space[14],
+  controls: {
     gap: Theme.space[12],
-    shadowColor: Theme.shadow.color,
-    shadowOpacity: 0.04,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 1,
-  },
-  searchInput: {
-    height: 48,
-    borderRadius: Theme.r.m,
-    paddingHorizontal: Theme.space[14],
-    borderWidth: 1,
-    borderColor: Theme.line,
-    backgroundColor: Theme.softBg,
-    color: Theme.text,
-    fontSize: 14,
-    fontWeight: "700",
   },
 
   filters: { flexDirection: "row", gap: Theme.space[10], flexWrap: "wrap" },
-  pill: {
-    paddingHorizontal: Theme.space[12],
-    paddingVertical: Theme.space[10],
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: Theme.line,
-    backgroundColor: Theme.softBg,
+  filterButton: {
+    minHeight: 44,
+    justifyContent: "center",
   },
-  pillActive: { backgroundColor: Theme.text, borderColor: Theme.text },
-  pillText: { color: Theme.text, fontSize: 13, fontWeight: "900" },
-  pillTextActive: { color: "#fff" },
 
   sectionHeader: {
     flexDirection: "row",
@@ -384,22 +330,11 @@ const styles = StyleSheet.create({
     marginTop: Theme.space[6],
   },
   sectionTitle: { fontSize: 18, fontWeight: "900", color: Theme.text, letterSpacing: -0.3 },
-  countPill: {
-    paddingHorizontal: Theme.space[12],
-    paddingVertical: Theme.space[8],
-    borderRadius: 999,
-    backgroundColor: Theme.card,
-    borderWidth: 1,
-    borderColor: Theme.line,
-  },
-  countPillText: { color: Theme.text, fontWeight: "900", fontSize: 12 },
 
-  grid: { flexDirection: "row", flexWrap: "wrap", gap: Theme.space[12] },
+  grid: { flexDirection: "row", flexWrap: "wrap", gap: Theme.space[12], alignItems: "stretch" },
 
   empty: {
-    color: Theme.muted,
-    fontWeight: "700",
-    fontStyle: "italic",
+    flexBasis: "100%",
     marginTop: Theme.space[12],
   },
   footerHint: { color: Theme.muted, fontSize: 12, fontWeight: "700", marginTop: Theme.space[10] },
